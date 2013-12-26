@@ -4,7 +4,7 @@ var should = require("should"),
 
 describe("Mongoise", function () {
     before(function (done) {
-        mongoise.connect(process.env.MONGOISE_TEST_URI).then(function () {
+        mongoise.connect(process.env.MONGOISE_TEST_URI).done(function () {
             done();
         });
     });
@@ -23,14 +23,14 @@ describe("Mongoise", function () {
 
     describe("CRUD", function () {
         it("should create a record", function (done) {
-            mongoise.collection("foo").insert({bar: "baz"}).then(function (result) {
+            mongoise.collection("foo").insert({bar: "baz"}).done(function (result) {
                 result[0].bar.should.equal("baz");
                 done();
             });
         });
 
         it("should find created a single record", function (done) {
-            mongoise.collection("foo").find({bar: "baz"}).then(function (result) {
+            mongoise.collection("foo").find({bar: "baz"}).done(function (result) {
                 result.bar.should.equal("baz");
                 done();
             });
@@ -38,12 +38,12 @@ describe("Mongoise", function () {
 
         it("should find multiple created records", function (done) {
             var dfd = new mongoise.Deferred();
-            mongoise.collection("foo").insert({bar: "baz"}).then(function () {
+            mongoise.collection("foo").insert({bar: "baz"}).done(function () {
                 dfd.resolve();
             });
 
-            dfd.promise.then(function () {
-                mongoise.collection("foo").find({bar: "baz"}).then(function (result) {
+            dfd.promise.done(function () {
+                mongoise.collection("foo").find({bar: "baz"}).done(function (result) {
                     result.length.should.equal(2);
                     done();
                 });
@@ -54,7 +54,7 @@ describe("Mongoise", function () {
     describe("fail", function () {
         it("should implement fail method", function (done) {
             mongoise.dbc.collection("bar").ensureIndex({a: 1}, {unique: true}, function () {
-                mongoise.collection("bar").insert({a: "bar"}).then(function () {
+                mongoise.collection("bar").insert({a: "bar"}).done(function () {
                     mongoise.collection("bar").insert({a: "bar"}).fail(function (err) {
                         should.exist(err);
                         done();
@@ -66,11 +66,11 @@ describe("Mongoise", function () {
 
     describe("Chain", function () {
         it("should chain then method", function (done) {
-            mongoise.collection("foo").find({bar: "baz"}).then(function (result) {
+            mongoise.collection("foo").find({bar: "baz"}).done(function (result) {
                 should.exist(result);
                 result.length.should.equal(2);
                 return "chained";
-            }).then(function (arg) {
+            }).done(function (arg) {
                 arg.should.equal("chained");
                 done();
             });
@@ -79,8 +79,8 @@ describe("Mongoise", function () {
         it("should respond to multiple then method", function (done) {
             var dfd = mongoise.collection("foo").find({bar: "baz"});
 
-            dfd.then(function () {
-                dfd.then(function (resu) {
+            dfd.done(function () {
+                dfd.done(function (resu) {
                     should.exist(resu);
                     done();
                 });

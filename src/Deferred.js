@@ -1,10 +1,17 @@
+/**
+ * Deferred implementation
+ */
 Deferred = function () {
     this.promise = new Promise;
+    // Used to ensure that a Deferred's status is not changed twice
     this.status = "pending";
     this.data = null;
 };
 
 Deferred.prototype = {
+    /**
+     * Resolve promises -- this is a successful action
+     */
     resolve: function () {
         if ("pending" !== this.status) {
             throw "Deferred has already completed.  Cannot resolve again";
@@ -12,14 +19,21 @@ Deferred.prototype = {
         this.status = "resolved";
         this.promise.status = "resolved";
         this.promise.data = Array.prototype.slice.call(arguments);
-        this.promise.thens.forEach(function (data) {
+
+        // Complete success callbacks
+        this.promise.dones.forEach(function (data) {
             this.promise.complete(data, this.promise.data);
         }.bind(this));
+
+        // Force resolution of failure callbacks as these may
+        // have chained success callbacks
         this.promise.fails.forEach(function (data) {
             this.promise.resolveChain(data, this.promise.data);
         }.bind(this));
     },
 
+    // TODO may be able to consolidate this with the resolve method above,
+    // to which it is similar
     reject: function () {
         if ("pending" !== this.status) {
             throw "Deferred has already completed.  Cannot reject again";
@@ -30,17 +44,17 @@ Deferred.prototype = {
         this.promise.fails.forEach(function (data) {
             this.promise.complete(data, this.promise.error);
         }.bind(this));
-        this.promise.thens.forEach(function (data) {
+        this.promise.dones.forEach(function (data) {
             this.promise.resolveChain(data, this.promise.error);
         }.bind(this));
     },
 };
 
 var Promise = function (dfd) {
-    // Then callbacks
-    this.thens = [];
+    // Success callbacks
+    this.dones = [];
 
-    // Fail callback
+    // Failure callback
     this.fails = [];
 
     this.data = null;
@@ -51,10 +65,10 @@ var Promise = function (dfd) {
 };
 
 Promise.prototype = {
-    then: function (cb) {
+    done: function (cb) {
         var dfd = new Deferred;
 
-        this.thens.push({
+        this.dones.push({
             cb: cb,
             dfd: dfd
         });

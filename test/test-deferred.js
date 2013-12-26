@@ -7,7 +7,7 @@ describe("Deferred", function () {
         it("should execute then after resolve", function (done) {
             var dfd = new mongoise.Deferred;
 
-            dfd.promise.then(function (arg) {
+            dfd.promise.done(function (arg) {
                 arg.should.equal("foo");
                 done();
             });
@@ -20,7 +20,7 @@ describe("Deferred", function () {
 
             dfd.resolve("bar");
 
-            dfd.promise.then(function (arg) {
+            dfd.promise.done(function (arg) {
                 arg.should.equal("bar");
                 done();
             });
@@ -32,7 +32,7 @@ describe("Deferred", function () {
 
             dfd.resolve("foo", "bar");
 
-            dfd.promise.then(function () {
+            dfd.promise.done(function () {
                 arguments.length.should.equal(2);
                 done();
             });
@@ -66,7 +66,7 @@ describe("Deferred", function () {
 
             dfd.promise.fail(function () {
                 arguments.length.should.equal(0);
-            }).then(function (arg) {
+            }).done(function (arg) {
                 arg.should.equal("foo");
                 done();
             });
@@ -77,7 +77,7 @@ describe("Deferred", function () {
         it("should chain fail to then", function (done) {
             var dfd = new mongoise.Deferred;
 
-            dfd.promise.then(function () {
+            dfd.promise.done(function () {
                 arguments.length.should.equal(0);
             }).fail(function (arg) {
                 arg.should.equal("foo");
@@ -90,9 +90,9 @@ describe("Deferred", function () {
         it("should chain then to then", function (done) {
             var dfd = new mongoise.Deferred;
 
-            dfd.promise.then(function () {
+            dfd.promise.done(function () {
                 return "foo"
-            }).then(function (arg) {
+            }).done(function (arg) {
                 arg.should.equal("foo");
                 done();
             });
