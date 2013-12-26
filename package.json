@@ -7,7 +7,7 @@
         "test": "test"
     },
     "scripts": {
-        "test": "NODE_ENV=test MONGOISE_TEST_URI=mongodb://localhost/MONGOISE_TEST mocha test/deferred.js"
+        "test": "NODE_ENV=test MONGOISE_TEST_URI=mongodb://localhost/MONGOISE_TEST mocha test/test-*.js"
     },
     "repository": {
         "type": "git",

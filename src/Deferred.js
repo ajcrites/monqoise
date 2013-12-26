@@ -1,75 +1,117 @@
-var Promise = function () {
+Deferred = function () {
+    this.promise = new Promise;
+    this.status = "pending";
+    this.data = null;
+};
+
+Deferred.prototype = {
+    resolve: function () {
+        if ("pending" !== this.status) {
+            throw "Deferred has already completed.  Cannot resolve again";
+        }
+        this.status = "resolved";
+        this.promise.status = "resolved";
+        this.promise.data = Array.prototype.slice.call(arguments);
+        this.promise.thens.forEach(function (data) {
+            this.promise.complete(data, this.promise.data);
+        }.bind(this));
+        this.promise.fails.forEach(function (data) {
+            this.promise.resolveChain(data, this.promise.data);
+        }.bind(this));
+    },
+
+    reject: function () {
+        if ("pending" !== this.status) {
+            throw "Deferred has already completed.  Cannot reject again";
+        }
+        this.status = "rejected";
+        this.promise.status = "rejected";
+        this.promise.error = Array.prototype.slice.call(arguments);
+        this.promise.fails.forEach(function (data) {
+            this.promise.complete(data, this.promise.error);
+        }.bind(this));
+        this.promise.thens.forEach(function (data) {
+            this.promise.resolveChain(data, this.promise.error);
+        }.bind(this));
+    },
+};
+
+var Promise = function (dfd) {
+    // Then callbacks
     this.thens = [];
+
+    // Fail callback
     this.fails = [];
+
+    this.data = null;
+
+    this.error = null;
+
+    this.status = "pending";
 };
 
 Promise.prototype = {
-    status: "pending",
-
     then: function (cb) {
-        var defer = new Deferred;
+        var dfd = new Deferred;
 
         this.thens.push({
             cb: cb,
-            defer: defer
+            dfd: dfd
         });
 
         if ("resolved" === this.status) {
             this.complete({
                 cb: cb,
-                defer: defer
+                dfd: dfd
             }, this.data);
         }
 
-        return defer.promise;
+        return dfd.promise;
     },
 
     fail: function (cb) {
-        var defer = new Defer;
+        var dfd = new Deferred;
 
         this.fails.push({
             cb: cb,
-            defer: defer
+            dfd: dfd
         });
 
         if ("rejected" === this.status) {
             this.complete({
                 cb: cb,
-                defer: defer
-            });
+                dfd: dfd
+            }, this.error);
         }
 
-        return defer.promise;
+        return dfd.promise;
     },
 
     complete: function (data, result) {
-        var res = data.cb.apply(this, result);
-        data.defer.resolve(res);
+        var result = data.cb.apply(this, result);
+        if ("resolved" === this.status) {
+            data.dfd.resolve(result);
+        }
+        else {
+            data.dfd.reject(result);
+        }
+    },
+
+    /**
+     * This method passes down the resolution/rejection to chained
+     * promises without executing the callback
+     *
+     * It should be used when this callback does not match the
+     * success/failure of chained callbacks
+     */
+    resolveChain: function (data, datum) {
+        if ("resolved" === this.status) {
+            data.dfd.resolve.apply(data.dfd, datum);
+        }
+        else {
+            data.dfd.reject.apply(data.dfd, datum);
+        }
     }
-};
-
-var Deferred = function () {
-    this.promise = new Promise();
-};
-
-Deferred.prototype = {
-    resolve: function (data) {
-        var promise = this.promise;
-        promise.data = data;
-        promise.status = "resolved";
-        promise.thens.forEach(function(callbackData) {
-            promise.complete(callbackData, data);
-        });
-    },
-
-    reject: function (error) {
-        var promise = this.promise;
-        promise.error = error;
-        promise.status = "rejected";
-        promise.fails.forEach(function(callbackData) {
-            promise.complete(callbackData, error);
-        });
-    },
 };
 
 module.exports = Deferred;
