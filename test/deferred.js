@@ -7,7 +7,7 @@ describe("Deferred", function () {
         it("should execute then after resolve", function (done) {
             var dfd = new mongoise.Deferred;
 
-            dfd.promise().then(function (arg) {
+            dfd.promise.then(function (arg) {
                 arg.should.equal("foo");
                 done();
             });
@@ -20,7 +20,7 @@ describe("Deferred", function () {
 
             dfd.resolve("bar");
 
-            dfd.promise().then(function (arg) {
+            dfd.promise.then(function (arg) {
                 arg.should.equal("bar");
                 done();
             });
@@ -32,13 +32,12 @@ describe("Deferred", function () {
 
             dfd.resolve("foo", "bar");
 
-            dfd.promise().then(function () {
+            dfd.promise.then(function () {
                 arguments.length.should.equal(2);
                 done();
             });
         });
 
-        /*
         it("should not allow resolve / change state twice", function (done) {
             var dfd = new mongoise.Deferred;
 
@@ -47,16 +46,18 @@ describe("Deferred", function () {
             try {
                 dfd.resolve();
             }
-            catch (err) {}
+            catch (err) {
+                err.should.contain("Cannot resolve");
+            }
 
             try {
                 dfd.reject();
             }
             catch (err) {
+                err.should.contain("Cannot reject");
                 done();
             }
         });
-        */
     });
 });
 
