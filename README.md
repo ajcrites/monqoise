@@ -28,25 +28,29 @@ Use mongoise to connect to the DB via the `connect` method.
 This method returns a promise, and you can continue
 from there.
 
-    var mongoise = require("mongoise"),
-        promise = mongoise.connect(MONGODB_URI);
-    promise.done(function (dbc) {
-        // dbc is the database connection
-    });
-    promise.fail(function (err) {
-        // err is a DB connection error
-    });
+```javascript
+var mongoise = require("mongoise"),
+    promise = mongoise.connect(MONGODB_URI);
+promise.done(function (dbc) {
+    // dbc is the database connection
+});
+promise.fail(function (err) {
+    // err is a DB connection error
+});
 
-    // You can also chain methods,
-    // even directly to the `.connect` call
-    promise.done(function (dbc) {}).fail(function (err) {});
+// You can also chain methods,
+// even directly to the `.connect` call
+promise.done(function (dbc) {}).fail(function (err) {});
+```
 
 Once mongoise is connected, you can use the collection
 API to do normal MongoDB operations using promises.
 
-    var users = mongoise.collection("users");
-    users.insert(query).done(function (result) {
-        // result is the inserted value
-    }).fail(function (err) {
-        // err is an error with the insert
-    });
+```javascript
+var users = mongoise.collection("users");
+users.insert(query).done(function (result) {
+    // result is the inserted value
+}).fail(function (err) {
+    // err is an error with the insert
+});
+```
