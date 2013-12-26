@@ -8,6 +8,8 @@ var
 var mongoise = function () {
     var self = this;
 
+    self.Deferred = Deferred;
+
     self.dbc = null;
 
     self.connect = function (uri) {
@@ -31,12 +33,14 @@ var mongoise = function () {
     };
 
     self.Collection = function (name, mongoise) {
-        var collection = this;
-        collection.name = name;
+        this.name = name;
+        this.mongoise = mongoise;
+    };
 
-        collection.insert = function (query) {
+    self.Collection.prototype = {
+        insert: function (query) {
             var dfd = new Deferred;
-            mongoise.dbc.collection(collection.name).insert(query, function (err, result) {
+            this.mongoise.dbc.collection(this.name).insert(query, function (err, result) {
                 if (err) {
                     dfd.reject(err);
                 }
@@ -46,8 +50,28 @@ var mongoise = function () {
             });
 
             return dfd.promise;
-        };
-    }
+        },
+
+        find: function (query) {
+            var dfd = new Deferred;
+            this.mongoise.dbc.collection(this.name).find(query).toArray(function (err, result) {
+                if (err) {
+                    dfd.reject(err);
+                }
+                else {
+                    // TODO should probably be a setting of some kind
+                    if (1 === result.length) {
+                        dfd.resolve(result[0]);
+                    }
+                    else {
+                        dfd.resolve(result);
+                    }
+                }
+            });
+
+            return dfd.promise;
+        }
+    };
 };
 
 module.exports = new mongoise();

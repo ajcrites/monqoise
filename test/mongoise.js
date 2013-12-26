@@ -28,5 +28,26 @@ describe("Mongoise", function () {
                 done();
             });
         });
+
+        it("should find created a single record", function (done) {
+            mongoise.collection("foo").find({bar: "baz"}).then(function (result) {
+                result.bar.should.equal("baz");
+                done();
+            });
+        });
+
+        it("should find multiple created records", function (done) {
+            var dfd = new mongoise.Deferred();
+            mongoise.collection("foo").insert({bar: "baz"}).then(function () {
+                dfd.resolve();
+            });
+
+            dfd.promise.then(function () {
+                mongoise.collection("foo").find({bar: "baz"}).then(function (result) {
+                    result.length.should.equal(2);
+                    done();
+                });
+            });
+        });
     });
 });
