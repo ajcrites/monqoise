@@ -1,0 +1,19 @@
+0 info it worked if it ends with ok
+1 verbose cli [ '/usr/bin/nodejs', '/usr/bin/npm', 'test' ]
+2 info using npm@1.2.18
+3 info using node@v0.10.15
+4 verbose read json /home/ajcrites/projects/personal/mongoise/test/package.json
+5 error Error: ENOENT, open '/home/ajcrites/projects/personal/mongoise/test/package.json'
+6 error If you need help, you may report this log at:
+6 error     <http://bugs.debian.org/npm>
+6 error or use
+6 error     reportbug --attach /home/ajcrites/projects/personal/mongoise/test/npm-debug.log npm
+7 error System Linux 3.11.0-14-generic
+8 error command "/usr/bin/nodejs" "/usr/bin/npm" "test"
+9 error cwd /home/ajcrites/projects/personal/mongoise/test
+10 error node -v v0.10.15
+11 error npm -v 1.2.18
+12 error path /home/ajcrites/projects/personal/mongoise/test/package.json
+13 error code ENOENT
+14 error errno 34
+15 verbose exit [ 34, true ]
