@@ -6,7 +6,7 @@ var Promise = function (dfd) {
 
 Promise.prototype = {
     then: function () {
-        self = this;
+        var self = this;
 
         Array.prototype.forEach.call(arguments, function (arg) {
             self.thencb.push({
@@ -28,8 +28,7 @@ Promise.prototype = {
     },
 
     fail: function () {
-        var dfd = new Deferred,
-            self = this;
+        var self = this;
 
         Array.prototype.forEach.call(arguments, function (arg) {
             self.failcb.push({

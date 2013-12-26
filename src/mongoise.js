@@ -1,8 +1,6 @@
 var
-    promise = require("./promise"),
     MongoClient = require("mongodb").MongoClient,
-    Promise = promise.Promise,
-    Deferred = promise.Deferred
+    Deferred = require("./Deferred")
 ;
 
 var mongoise = function () {
