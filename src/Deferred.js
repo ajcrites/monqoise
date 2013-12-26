@@ -1,5 +1,3 @@
-var Promise = require("./Promise");
-
 Deferred = function () {
     this.promise = new Promise;
     this.status = "pending";
@@ -17,6 +15,9 @@ Deferred.prototype = {
         this.promise.thens.forEach(function (data) {
             this.promise.complete(data, this.promise.data);
         }.bind(this));
+        this.promise.fails.forEach(function (data) {
+            this.promise.resolveChain(data, this.promise.data);
+        }.bind(this));
     },
 
     reject: function () {
@@ -25,10 +26,13 @@ Deferred.prototype = {
         }
         this.status = "rejected";
         this.promise.status = "rejected";
-        this.promise.data = Array.prototype.slice.call(arguments);
+        this.promise.error = Array.prototype.slice.call(arguments);
         this.promise.fails.forEach(function (data) {
-            this.promise.complete(data, this.promise.data);
-        });
+            this.promise.complete(data, this.promise.error);
+        }.bind(this));
+        this.promise.thens.forEach(function (data) {
+            this.promise.resolveChain(data, this.promise.error);
+        }.bind(this));
     },
 };
 
@@ -40,6 +44,8 @@ var Promise = function (dfd) {
     this.fails = [];
 
     this.data = null;
+
+    this.error = null;
 
     this.status = "pending";
 };
@@ -63,6 +69,24 @@ Promise.prototype = {
         return dfd.promise;
     },
 
+    fail: function (cb) {
+        var dfd = new Deferred;
+
+        this.fails.push({
+            cb: cb,
+            dfd: dfd
+        });
+
+        if ("rejected" === this.status) {
+            this.complete({
+                cb: cb,
+                dfd: dfd
+            }, this.error);
+        }
+
+        return dfd.promise;
+    },
+
     complete: function (data, result) {
         var result = data.cb.apply(this, result);
         if ("resolved" === this.status) {
@@ -70,6 +94,22 @@ Promise.prototype = {
         }
         else {
             data.dfd.reject(result);
+        }
+    },
+
+    /**
+     * This method passes down the resolution/rejection to chained
+     * promises without executing the callback
+     *
+     * It should be used when this callback does not match the
+     * success/failure of chained callbacks
+     */
+    resolveChain: function (data, datum) {
+        if ("resolved" === this.status) {
+            data.dfd.resolve.apply(data.dfd, datum);
+        }
+        else {
+            data.dfd.reject.apply(data.dfd, datum);
         }
     }
 };
