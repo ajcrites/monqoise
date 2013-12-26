@@ -38,7 +38,6 @@ describe("Deferred", function () {
             });
         });
 
-        /*
         it("should not allow resolve / change state twice", function (done) {
             var dfd = new mongoise.Deferred;
 
@@ -47,16 +46,32 @@ describe("Deferred", function () {
             try {
                 dfd.resolve();
             }
-            catch (err) {}
+            catch (err) {
+                err.should.contain("resolve again");
+            }
 
             try {
                 dfd.reject();
             }
             catch (err) {
+                err.should.contain("reject again");
                 done();
             }
         });
-        */
+
+        it("should allow then chaining", function (done) {
+            var dfd = new mongoise.Deferred;
+
+            dfd.promise().then(function (arg) {
+                arg.should.equal("foo");
+                return "bar";
+            }).then(function (arg) {
+                arg.should.equal("bar");
+                done();
+            });
+
+            dfd.resolve("foo");
+        });
     });
 });
 
