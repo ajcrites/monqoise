@@ -61,6 +61,9 @@ var mongoise = function () {
                     if (1 === result.length) {
                         dfd.resolve(result[0]);
                     }
+                    else if (0 === result.length) {
+                        dfd.resolve(null);
+                    }
                     else {
                         dfd.resolve(result);
                     }

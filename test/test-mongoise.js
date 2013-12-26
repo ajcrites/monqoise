@@ -2,7 +2,6 @@ var should = require("should"),
     mongoise = require("../src/mongoise")
 ;
 
-/*
 describe("Mongoise", function () {
     before(function (done) {
         mongoise.connect(process.env.MONGOISE_TEST_URI).then(function () {
@@ -67,9 +66,12 @@ describe("Mongoise", function () {
 
     describe("Chain", function () {
         it("should chain then method", function (done) {
-            mongoise.collection("foo").find({bar: "baz"}).then().then(function (result) {
+            mongoise.collection("foo").find({bar: "baz"}).then(function (result) {
                 should.exist(result);
                 result.length.should.equal(2);
+                return "chained";
+            }).then(function (arg) {
+                arg.should.equal("chained");
                 done();
             });
         });
@@ -88,4 +90,3 @@ describe("Mongoise", function () {
         });
     });
 });
-*/
