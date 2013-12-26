@@ -16,7 +16,9 @@ describe("Mongoise", function () {
         it("should connect", function (done) {
             should.exist(mongoise.dbc);
             mongoise.dbc.collection("foo").drop(function () {
-                done();
+                mongoise.dbc.collection("bar").drop(function () {
+                    done();
+                });
             });
         });
     });
@@ -47,6 +49,42 @@ describe("Mongoise", function () {
                     result.length.should.equal(2);
                     done();
                 });
+            });
+        });
+    });
+
+    describe("fail", function () {
+        it("should implement fail method", function (done) {
+            mongoise.dbc.collection("bar").ensureIndex({a: 1}, {unique: true}, function () {
+                mongoise.collection("bar").insert({a: "bar"}).then(function () {
+                    mongoise.collection("bar").insert({a: "bar"}).fail(function (err) {
+                        should.exist(err);
+                        done();
+                    });
+                });
+            });
+        });
+    });
+
+    describe("Chain", function () {
+        it("should chain then method", function (done) {
+            mongoise.collection("foo").find({bar: "baz"}).then().then(function (result) {
+                should.exist(result);
+                result.length.should.equal(2);
+                done();
+            });
+        });
+
+        it("should respond to multiple then method", function (done) {
+            var dfd = mongoise.collection("foo").find({bar: "baz"});
+
+            dfd.then(function () {
+                dfd.then(function (resu) {
+                    should.exist(resu);
+                    done();
+                });
+
+                return arguments;
             });
         });
     });

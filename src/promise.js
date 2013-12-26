@@ -1,35 +1,50 @@
-var Promise = function () {
+var Promise = function (dfd) {
     this.thencb = [];
     this.failcb = [];
+    this.dfd = dfd;
 };
 
 Promise.prototype = {
-    then: function (then, fail) {
-        var dfd = new Deferred;
+    then: function () {
+        self = this;
 
-        this.thencb.push({
-            cb: then,
-            dfd: dfd
-        })
+        Array.prototype.forEach.call(arguments, function (arg) {
+            self.thencb.push({
+                cb: arg,
+                dfd: self.dfd
+            });
+        });
 
-        if (fail) {
-            this.failcb.push({
-                cb: fail,
-                dfd: dfd
+        if ("resolved" === self.status) {
+            Array.prototype.forEach.call(arguments, function (arg) {
+                self.resolve({
+                    cb: arg,
+                    dfd: self.dfd
+                });
             });
         }
 
-        if ("resolved" === this.status) {
-            this.resolve({
-                cb: then,
+        return self.dfd.promise;
+    },
+
+    fail: function () {
+        var dfd = new Deferred,
+            self = this;
+
+        Array.prototype.forEach.call(arguments, function (arg) {
+            self.failcb.push({
+                cb: arg,
                 dfd: dfd
-            }, this.data)
-        }
-        else if ("rejected" === this.status) {
-            this.resolve({
-                cb: fail,
-                dfd: dfd
-            }, this.error);
+            });
+        });
+
+        if ("rejected" === self.status) {
+            Array.prototype.forEach.call(arguments, function (arg) {
+                self.resolve({
+                    cb: arg,
+                    dfd: dfd
+                });
+            });
         }
 
         return dfd.promise;
@@ -50,7 +65,7 @@ Promise.prototype = {
 };
 
 Deferred = function () {
-    this.promise = new Promise;
+    this.promise = new Promise(this);
 };
 
 Deferred.prototype = {
@@ -59,18 +74,18 @@ Deferred.prototype = {
         var promise = this.promise;
         promise.data = data;
         promise.status = "resolved";
-        promise.thencb.forEach(function (cbdata) {
-            promise.resolve(cbdata, data);
-        });
+        while (cb = promise.thencb.shift()) {
+            promise.resolve(cb, data);
+        }
     },
 
     reject: function (error) {
         var promise = this.promise;
         promise.error = error;
         promise.status = "rejected";
-        promise.failcb.forEach(function (cbdata) {
-            promise.resolve(cbdata, error);
-        });
+        while (cb = promise.failcb.shift()) {
+            promise.resolve(cb, error);
+        }
     },
 
     bind: function (promise) {
@@ -86,4 +101,3 @@ Deferred.prototype = {
 
 exports.Promise = Promise;
 exports.Deferred = Deferred;
-
