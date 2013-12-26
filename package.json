@@ -1,0 +1,24 @@
+{
+    "name": "mongoise",
+    "version": "0.0.0",
+    "description": "Promise-like wrapper around default MongoClient",
+    "main": "src/main.js",
+    "directories": {
+        "test": "test"
+    },
+    "scripts": {
+        "test": "mocha test/test-*.js"
+    },
+    "repository": {
+        "type": "git",
+        "url": "git://github.com/ajcrites/mongoise.git"
+    },
+    "keywords": [
+        "MongoDB",
+        "Promise"
+    ],
+    "author": "Andrew Crites",
+    "license": "Unlicense",
+    "readmeFilename": "README.md",
+    "gitHead": "957664a99327b20eed67de514ecdc9a0b20d3a49"
+}
