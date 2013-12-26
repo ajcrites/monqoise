@@ -30,8 +30,8 @@ describe("Mongoise", function () {
         });
 
         it("should find created a single record", function (done) {
-            mongoise.collection("foo").find({bar: "baz"}).done(function (result) {
-                result.bar.should.equal("baz");
+            mongoise.collection("foo").find({bar: "baz"}).toArray().done(function (result) {
+                result[0].bar.should.equal("baz");
                 done();
             });
         });
@@ -43,10 +43,17 @@ describe("Mongoise", function () {
             });
 
             dfd.promise.done(function () {
-                mongoise.collection("foo").find({bar: "baz"}).done(function (result) {
+                mongoise.collection("foo").find({bar: "baz"}).toArray().done(function (result) {
                     result.length.should.equal(2);
                     done();
                 });
+            });
+        });
+
+        it("should not find a nonextant record", function (done) {
+            mongoise.collection("foo").find({bar: "no such bar"}).toArray().done(function (result) {
+                result.length.should.equal(0);
+                done();
             });
         });
     });
@@ -66,7 +73,7 @@ describe("Mongoise", function () {
 
     describe("Chain", function () {
         it("should chain then method", function (done) {
-            mongoise.collection("foo").find({bar: "baz"}).done(function (result) {
+            mongoise.collection("foo").find({bar: "baz"}).toArray().done(function (result) {
                 should.exist(result);
                 result.length.should.equal(2);
                 return "chained";
@@ -77,15 +84,40 @@ describe("Mongoise", function () {
         });
 
         it("should respond to multiple then method", function (done) {
-            var dfd = mongoise.collection("foo").find({bar: "baz"});
+            var promise = mongoise.collection("foo").find({bar: "baz"}).toArray();
 
-            dfd.done(function () {
-                dfd.done(function (resu) {
+            promise.done(function () {
+                promise.done(function (resu) {
                     should.exist(resu);
                     done();
                 });
 
                 return arguments;
+            });
+        });
+    });
+
+    describe("Insert Options", function () {
+        it("should allow options argument for insert", function (done) {
+            mongoise.collection("foo").insert({doc: "shock"}, {checkKeys: false}).done(function (results) {
+                results[0].doc.should.equal("shock");
+                done();
+            });
+        });
+
+        it("should insert multiple records", function (done) {
+            mongoise.collection("foo").insert([{doc: "more"}, {doc: "docs"}]).done(function (results) {
+                results.length.should.equal(2);
+                done();
+            });
+        });
+    });
+
+    describe("Find Options", function () {
+        it("should allow no argument for find", function (done) {
+            mongoise.collection("bar").find().toArray().done(function (results) {
+                results.length.should.equal(1);
+                done();
             });
         });
     });

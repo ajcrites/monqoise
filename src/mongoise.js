@@ -33,12 +33,39 @@ var mongoise = function () {
     self.Collection = function (name, mongoise) {
         this.name = name;
         this.mongoise = mongoise;
+
+        this.Cursor = function (query) {
+            this.query = query;
+        }
+
+        this.Cursor.prototype = {
+            toArray: function () {
+                var dfd = new Deferred;
+                this.query.toArray(function (err, result) {
+                    if (err) {
+                        dfd.reject(err);
+                    }
+                    else {
+                        dfd.resolve(result);
+                    }
+                });
+
+                return dfd.promise;
+            }
+        }
     };
 
     self.Collection.prototype = {
         insert: function (query) {
-            var dfd = new Deferred;
-            this.mongoise.dbc.collection(this.name).insert(query, function (err, result) {
+            var collection,
+                dfd = new Deferred,
+                args = [query];
+
+            if (arguments[1]) {
+                args.push(arguments[1]);
+            }
+
+            args.push(function (err, result) {
                 if (err) {
                     dfd.reject(err);
                 }
@@ -47,31 +74,16 @@ var mongoise = function () {
                 }
             });
 
+            collection = this.mongoise.dbc.collection(this.name);
+            collection.insert.apply(collection, args);
+
             return dfd.promise;
         },
 
         find: function (query) {
             var dfd = new Deferred;
-            this.mongoise.dbc.collection(this.name).find(query).toArray(function (err, result) {
-                if (err) {
-                    dfd.reject(err);
-                }
-                else {
-                    // TODO should probably be a setting of some kind
-                    if (1 === result.length) {
-                        dfd.resolve(result[0]);
-                    }
-                    else if (0 === result.length) {
-                        dfd.resolve(null);
-                    }
-                    else {
-                        dfd.resolve(result);
-                    }
-                }
-            });
-
-            return dfd.promise;
-        }
+            return new this.Cursor(this.mongoise.dbc.collection(this.name).find(query));
+        },
     };
 };
 
