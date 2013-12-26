@@ -2,12 +2,12 @@
     "name": "mongoise",
     "version": "0.0.0",
     "description": "Promise-like wrapper around default MongoClient",
-    "main": "src/main.js",
+    "main": "src/mongoise.js",
     "directories": {
         "test": "test"
     },
     "scripts": {
-        "test": "NODE_ENV=test MONGOISE_TEST_URI=mongodb://localhost/MONGOISE_TEST mocha test/*.js"
+        "test": "NODE_ENV=test MONGOISE_TEST_URI=mongodb://localhost/MONGOISE_TEST mocha test/mongoise.js"
     },
     "repository": {
         "type": "git",
@@ -21,9 +21,11 @@
     "license": "Unlicense",
     "readmeFilename": "README.md",
     "gitHead": "957664a99327b20eed67de514ecdc9a0b20d3a49",
+    "dependencies": {
+        "mongodb": "1.3.x"
+    },
     "devDependencies": {
         "mocha": "1.16.x",
-        "should": "2.1.x",
-        "mongodb": "1.3.x"
+        "should": "2.1.x"
     }
 }
