@@ -112,6 +112,30 @@ describe("Deferred", function () {
 
             dfd.reject();
         });
+
+        describe("allow empty callbacks", function () {
+            it("should allow empty done", function (done) {
+                var dfd = new mongoise.Deferred;
+
+                dfd.promise.fail().done().done(function (arg) {
+                    should.not.exist(arg);
+                    done();
+                });
+
+                dfd.resolve("foo");
+            });
+
+            it("should allow empty fail", function (done) {
+                var dfd = new mongoise.Deferred;
+
+                dfd.promise.done().fail().fail(function (arg) {
+                    should.not.exist(arg);
+                    done();
+                });
+
+                dfd.reject("foo");
+            });
+        });
     });
 });
 

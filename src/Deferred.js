@@ -65,8 +65,16 @@ var Promise = function (dfd) {
 };
 
 Promise.prototype = {
-    done: function (cb) {
-        var dfd = new Deferred;
+    done: function () {
+        var cb,
+            dfd = new Deferred;
+
+        if (0 === arguments.length) {
+            cb = function () {};
+        }
+        else {
+            cb = arguments[0];
+        }
 
         this.dones.push({
             cb: cb,
@@ -83,8 +91,16 @@ Promise.prototype = {
         return dfd.promise;
     },
 
-    fail: function (cb) {
-        var dfd = new Deferred;
+    fail: function () {
+        var cb,
+            dfd = new Deferred;
+
+        if (0 === arguments.length) {
+            cb = function () {};
+        }
+        else {
+            cb = arguments[0];
+        }
 
         this.fails.push({
             cb: cb,
