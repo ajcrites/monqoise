@@ -1,12 +1,12 @@
-Cursor = function (query, mongoise) {
-    this.query = query;
+Cursor = function (cursor, mongoise) {
+    this.cursor = cursor;
     this.mongoise = mongoise;
 };
 
 Cursor.prototype = {
     toArray: function () {
         var dfd = new this.mongoise.Deferred;
-        this.query.toArray(function (err, result) {
+        this.cursor.toArray(function (err, result) {
             if (err) {
                 dfd.reject(err);
             }
