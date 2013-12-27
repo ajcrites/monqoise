@@ -47,14 +47,14 @@ describe("Deferred", function () {
                 dfd.resolve();
             }
             catch (err) {
-                err.should.contain("Cannot resolve");
+                err.should.contain("Cannot set resolve");
             }
 
             try {
                 dfd.reject();
             }
             catch (err) {
-                err.should.contain("Cannot reject");
+                err.should.contain("Cannot set reject");
                 done();
             }
         });

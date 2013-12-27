@@ -9,12 +9,21 @@ var Mongoise = function (dbc) {
 };
 
 Mongoise.prototype = {
+    /**
+     * Create MongoClient connection with the provided URI
+     * @return Promise
+     */
     connect: function (uri) {
-        var promise = this.callMethodWithDeferred(MongoClient, "connect", [uri])
+        var promise = this.callMethodWithDeferred(MongoClient,
+            MongoClient.connect, [uri])
         promise.done(function (dbc) { this.dbc = dbc; }.bind(this));
         return promise;
     },
 
+    /**
+     * Create a Mongoise Collection of the provided name
+     * This communicates with the MongoDB Collection API internally
+     */
     collection: function (name) {
         if (!this.dbc || !this.dbc.collection) {
             throw "Mongoise instance does not have a database connection or "
@@ -23,11 +32,21 @@ Mongoise.prototype = {
         return new Collection(name, this);
     },
 
-    callMethodWithDeferred: function (object, methodName, args) {
+    /**
+     * Magical method -- at least where the magic happens.
+     * @argument Context object that the method is applied to
+     * @argument Function to call
+     * @argument Array of arguments to pass to the method
+     *
+     * This works under the assumption that the method takes a callback
+     * argument and calls it with two arguments.  In order: an error that
+     * should be null if nothing when wrong, and some kind of result data
+     */
+    callMethodWithDeferred: function (object, method, args) {
         var dfd = new Deferred;
 
-        // args should be an Arguments object
-        // ensure that it is an array so it will work with apply
+        // `args` will likely be an Arguments object
+        // Ensure that it is an array so we can push to it
         args = Array.prototype.slice.call(args);
         args.push(function (err, result) {
             if (err) {
@@ -39,7 +58,7 @@ Mongoise.prototype = {
         });
 
         // Method should be called with the context of the caller
-        object[methodName].apply(object, args);
+        method.apply(object, args);
 
         return dfd.promise;
     },

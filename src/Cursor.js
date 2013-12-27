@@ -16,7 +16,8 @@ methods = ["toArray", "each", "count", "sort", "limit", "maxTimeMS",
 
 methods.forEach(function (func) {
     Cursor.prototype[func] = function () {
-        return this.mongoise.callMethodWithDeferred(this.cursor, func, arguments);
+        return this.mongoise.callMethodWithDeferred(this.cursor,
+            this.cursor[func], arguments);
     };
 });
 

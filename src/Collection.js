@@ -17,7 +17,8 @@ methods = ["insert", "remove", "save", "update", "distinct", "count", "findAndMo
 "indexExists", "geoNear", "geoHaystackSearch", "indexes", "stats"];
 methods.forEach(function (func) {
     Collection.prototype[func] = function () {
-        return this.mongoise.callMethodWithDeferred(this.collection, func, arguments);
+        return this.mongoise.callMethodWithDeferred(this.collection,
+            this.collection[func], arguments);
     };
 });
 
@@ -28,7 +29,8 @@ Collection.prototype.aggregate = function () {
         return this.cursor(this.collection.aggregate, arguments);
     }
     else {
-        return this.mongoise.callMethodWithDeferred(this.collection, "aggregate", arguments);
+        return this.mongoise.callMethodWithDeferred(this.collection,
+            this.collection.aggregate, arguments);
     }
 }
 
