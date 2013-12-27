@@ -4,32 +4,42 @@ var
     Collection = require("./Collection")
 ;
 
-var mongoise = function () {
-    var self = this;
+var Mongoise = function (dbc) {
+    this.dbc = dbc;
+};
 
-    self.Deferred = Deferred;
+Mongoise.prototype = {
+    connect: function (uri) {
+        var promise = this.callMethodWithDeferred(MongoClient, "connect", [uri])
+        promise.done(function (dbc) { this.dbc = dbc; }.bind(this));
+        return promise;
+    },
 
-    self.dbc = null;
+    collection: function (name) {
+        return new Collection(name, this);
+    },
 
-    self.connect = function (uri) {
+    callMethodWithDeferred: function (object, methodName, args) {
         var dfd = new Deferred;
 
-        MongoClient.connect(uri, function (err, dbc) {
+        // args should be an Arguments object
+        // ensure that it is an array so it will work with apply
+        args = Array.prototype.slice.call(args);
+        args.push(function (err, result) {
             if (err) {
                 dfd.reject(err);
             }
             else {
-                self.dbc = dbc;
-                dfd.resolve(dbc);
+                dfd.resolve(result);
             }
         });
 
-        return dfd.promise;
-    };
+        // Method should be called with the context of the caller
+        object[methodName].apply(object, args);
 
-    self.collection = function (name) {
-        return new Collection(name, self);
-    };
+        return dfd.promise;
+    },
 };
 
-module.exports = new mongoise();
+exports.Mongoise = Mongoise;
+exports.Deferred = Deferred;

@@ -7,24 +7,6 @@ var Collection = function (name, mongoise) {
     this.collection = this.mongoise.dbc.collection(this.name);
 };
 
-Collection.prototype.createDeferredArg = function (method, args) {
-    var dfd = new this.mongoise.Deferred;
-
-    args = Array.prototype.slice.call(args);
-    args.push(function (err, result) {
-        if (err) {
-            dfd.reject(err);
-        }
-        else {
-            dfd.resolve(result);
-        }
-    });
-
-    method.apply(this.collection, args);
-
-    return dfd.promise;
-};
-
 Collection.prototype.cursor = function (method, args) {
     return new Cursor(method.apply(this.collection, args), this.mongoise);
 }
@@ -35,19 +17,18 @@ methods = ["insert", "remove", "save", "update", "distinct", "count", "findAndMo
 "indexExists", "geoNear", "geoHaystackSearch", "indexes", "stats"];
 methods.forEach(function (func) {
     Collection.prototype[func] = function () {
-        return this.createDeferredArg(this.collection[func], arguments);
+        return this.mongoise.callMethodWithDeferred(this.collection, func, arguments);
     };
 });
 
 Collection.prototype.aggregate = function () {
-    var dfd;
     // TODO there may be a better method for checking if a cusor
     // will be returned
     if (arguments.length >= 2 && arguments[1].hasOwnProperty("cursor")) {
         return this.cursor(this.collection.aggregate, arguments);
     }
     else {
-        return this.createDeferredArg(this.collection.aggregate, arguments);
+        return this.mongoise.callMethodWithDeferred(this.collection, "aggregate", arguments);
     }
 }
 

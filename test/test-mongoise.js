@@ -1,6 +1,8 @@
 var should = require("should"),
-    mongoise = require("../src/mongoise")
+    mongoise = new require("../src/mongoise")
 ;
+Deferred = mongoise.Deferred;
+mongoise = new mongoise.Mongoise;
 
 describe("Mongoise", function () {
     before(function (done) {
@@ -37,7 +39,7 @@ describe("Mongoise", function () {
         });
 
         it("should find multiple created records", function (done) {
-            var dfd = new mongoise.Deferred();
+            var dfd = new Deferred;
             mongoise.collection("foo").insert({bar: "baz"}).done(function () {
                 dfd.resolve();
             });
