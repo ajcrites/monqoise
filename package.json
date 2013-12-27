@@ -1,6 +1,6 @@
 {
     "name": "mongoise",
-    "version": "0.0.0",
+    "version": "0.1.0",
     "description": "Promise-like wrapper around default MongoClient",
     "main": "src/mongoise.js",
     "directories": {
