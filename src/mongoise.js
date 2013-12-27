@@ -16,6 +16,10 @@ Mongoise.prototype = {
     },
 
     collection: function (name) {
+        if (!this.dbc || !this.dbc.collection) {
+            throw "Mongoise instance does not have a database connection or "
+                + "the provided connection is not a MongoClient instance conneciton";
+        }
         return new Collection(name, this);
     },
 

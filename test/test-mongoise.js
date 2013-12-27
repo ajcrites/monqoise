@@ -1,8 +1,8 @@
 var should = require("should"),
-    mongoise = new require("../src/mongoise")
+    mongoisePackage = new require("../src/mongoise")
 ;
-Deferred = mongoise.Deferred;
-mongoise = new mongoise.Mongoise;
+Deferred = mongoisePackage.Deferred;
+mongoise = new mongoisePackage.Mongoise;
 
 describe("Mongoise", function () {
     before(function (done) {
@@ -121,6 +121,20 @@ describe("Mongoise", function () {
                 results.length.should.equal(1);
                 done();
             });
+        });
+    });
+
+    describe("No connection handling", function () {
+        it("should throw an exception for collection with no DB", function (done) {
+            var mongoise = new mongoisePackage.Mongoise;
+
+            try {
+                mongoise.collection("foo");
+            }
+            catch (err) {
+                should.exist(err);
+                done();
+            }
         });
     });
 });
