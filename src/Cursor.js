@@ -1,5 +1,10 @@
 var methods,
     Cursor = function (cursor, mongoise) {
+
+    if (!cursor) {
+        throw "Cursor argument is not a cursor value.  Method call does not "
+            + "seem to return a cursor";
+    }
     this.cursor = cursor;
     this.mongoise = mongoise;
 };

@@ -35,7 +35,7 @@ methods.forEach(function (func) {
         // TODO there may be a better method for checking if a cusor
         // will be returned
         if (arguments.length >= 2 && arguments[1].hasOwnProperty("cursor")) {
-            return this.cursor(this.collection.aggregate, arguments);
+            return this.cursor(this.collection[func], arguments);
         }
         else {
             return this.mongoise.callMethodWithDeferred(this.collection,
