@@ -11,6 +11,10 @@ Collection.prototype.cursor = function (method, args) {
     return new Cursor(method.apply(this.collection, args), this.mongoise);
 }
 
+/**
+ * Methods that require a callback and return a document, status, etc.
+ * Anything except a cursor
+ */
 methods = ["insert", "remove", "save", "update", "distinct", "count", "findAndModify",
 "findAndRemove", "createIndex", "ensureIndex", "indexInformation", "dropIndex",
 "dropAllIndexes", "reIndex", "mapReduce", "group", "options", "isCapped",
@@ -22,19 +26,28 @@ methods.forEach(function (func) {
     };
 });
 
-Collection.prototype.aggregate = function () {
-    // TODO there may be a better method for checking if a cusor
-    // will be returned
-    if (arguments.length >= 2 && arguments[1].hasOwnProperty("cursor")) {
-        return this.cursor(this.collection.aggregate, arguments);
+/**
+ * Methods that may return a cursor depending upon the arguments
+ */
+methods = ["aggregate", "findOne"];
+methods.forEach(function (func) {
+    Collection.prototype[func] = function () {
+        // TODO there may be a better method for checking if a cusor
+        // will be returned
+        if (arguments.length >= 2 && arguments[1].hasOwnProperty("cursor")) {
+            return this.cursor(this.collection.aggregate, arguments);
+        }
+        else {
+            return this.mongoise.callMethodWithDeferred(this.collection,
+                this.collection[func], arguments);
+        }
     }
-    else {
-        return this.mongoise.callMethodWithDeferred(this.collection,
-            this.collection.aggregate, arguments);
-    }
-}
+});
 
-methods = ["find", "findOne"]
+/**
+ * Methods that return a cursor
+ */
+methods = ["find"]
 methods.forEach(function(func) {
     Collection.prototype[func] = function () {
         return this.cursor(this.collection[func], arguments);

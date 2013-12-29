@@ -325,3 +325,5 @@ will be these same arguments.
 ## TODO
 * Implement `.then`
 * In general, follow popular promise implementations closer
+* Add more tests, especially for methods with weird
+ behavior like `.find` and `.aggregate`

@@ -137,4 +137,13 @@ describe("Mongoise", function () {
             }
         });
     });
+
+    describe("findOne", function () {
+        it("should work with findOne", function (done) {
+            mongoise.collection("foo").findOne().done(function (result) {
+                should.exist(result);
+                done();
+            });
+        });
+    });
 });
