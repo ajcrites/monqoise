@@ -66,3 +66,26 @@ Mongoise.prototype = {
 
 exports.Mongoise = Mongoise;
 exports.Deferred = Deferred;
+exports.when = function () {
+    var dfd = new Deferred,
+        remaining = arguments.length,
+        resolutions = [];
+
+    Array.prototype.forEach.call(arguments, function (elem) {
+        elem.done(function () {
+            remaining--;
+
+            resolutions = resolutions.concat(Array.prototype.slice.call(arguments));
+
+            if (remaining === 0) {
+                dfd.resolve.apply(dfd, resolutions);
+            }
+        });
+
+        elem.fail(function () {
+            dfd.reject.apply(dfd, arguments);
+        });
+    });
+
+    return dfd.promise;
+};

@@ -137,5 +137,34 @@ describe("Deferred", function () {
             });
         });
     });
+
+    describe(".when", function () {
+        it ("should succeed when all .when succeed", function (done) {
+            var dfd1 = new mongoise.Deferred,
+                dfd2 = new mongoise.Deferred;
+
+            dfd1.resolve("foo");
+            dfd2.resolve("bar");
+
+            mongoise.when(dfd1.promise, dfd2.promise).done(function (arg1, arg2) {
+                arg1.should.equal("foo");
+                arg2.should.equal("bar");
+                done();
+            });
+        });
+
+        it("should fail when any .when fails", function (done) {
+            var dfd1 = new mongoise.Deferred,
+                dfd2 = new mongoise.Deferred;
+
+            dfd1.resolve("foo");
+            dfd2.reject("baz");
+
+            mongoise.when(dfd1.promise, dfd2.promise).fail(function (arg1) {
+                arg1.should.equal("baz");
+                done();
+            });
+        });
+    });
 });
 
