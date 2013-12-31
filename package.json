@@ -1,17 +1,17 @@
 {
-    "name": "mongoise",
+    "name": "monqoise",
     "version": "0.3.0",
-    "description": "Promise-like wrapper around default MongoClient",
-    "main": "src/mongoise.js",
+    "description": "Promise-like wrapper around default MongoClient using Q",
+    "main": "src/monqoise.js",
     "directories": {
         "test": "test"
     },
     "scripts": {
-        "test": "NODE_ENV=test MONGOISE_TEST_URI=mongodb://localhost/MONGOISE_TEST mocha test/test-*.js"
+        "test": "NODE_ENV=test MONQOISE_TEST_URI=mongodb://localhost/MONQOISE_TEST mocha test/test-*.js"
     },
     "repository": {
         "type": "git",
-        "url": "git://github.com/ajcrites/mongoise.git"
+        "url": "git://github.com/ajcrites/monqoise.git"
     },
     "keywords": [
         "MongoDB",
@@ -22,7 +22,8 @@
     "readmeFilename": "README.md",
     "gitHead": "957664a99327b20eed67de514ecdc9a0b20d3a49",
     "dependencies": {
-        "mongodb": "1.3.x"
+        "mongodb": "1.3.x",
+        "q": "0.9.x"
     },
     "devDependencies": {
         "mocha": "1.16.x",

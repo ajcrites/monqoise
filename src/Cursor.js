@@ -1,12 +1,13 @@
 var methods,
-    Cursor = function (cursor, mongoise) {
+    Q = require("q"),
+    monqoise = require("./monqoise"),
+    Cursor = function (cursor) {
 
     if (!cursor) {
         throw "Cursor argument is not a cursor value.  Method call does not "
             + "seem to return a cursor";
     }
     this.cursor = cursor;
-    this.mongoise = mongoise;
 };
 
 methods = ["rewind", "stream", "isClosed"];
@@ -21,8 +22,7 @@ methods = ["toArray", "each", "count", "sort", "limit", "maxTimeMS",
 
 methods.forEach(function (func) {
     Cursor.prototype[func] = function () {
-        return this.mongoise.callMethodWithDeferred(this.cursor,
-            this.cursor[func], arguments);
+        return monqoise.argumentInvoke(this.cursor, func, arguments);
     };
 });
 

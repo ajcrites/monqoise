@@ -1,26 +1,18 @@
-# Mongoise -- Mongo Promise library
+# Monqoise -- Mongo Promise library built off of Q
 
-[![Build Status](https://travis-ci.org/ajcrites/mongoise.png)](https://travis-ci.org/ajcrites/mongoise)
+***NOTE:*** This documentation needs to be updated
 
-Pronounce as "mong-oise," although "mongo-iss" may
+This is a fork of the (now killed) Mongoise project that
+uses Q as its deferred library.
+
+[![Build Status](https://travis-ci.org/ajcrites/monqoise.png)](https://travis-ci.org/ajcrites/monqoise)
+
+Pronounce as "mawnk-oise," although "mawkno-iss" may
 make more sense.
 
 This library creates a very simple promise wrapper
 around the default Node Mongo client allowing it
 to be used with promise-like syntax.
-
-Mongoise implements its own `Deferred` and `Promise`
-objects that do not adhere to the
-[Promises/A+ specification](http://promises-aplus.github.io/promises-spec/).
-
-Instead, Mongoise has an implementation that is similar
-to the [`jQuery` Deferred Object](http://api.jquery.com/category/deferred-object/).
-
-Mongoise exposes two objects: the `Deferred` object, which
-can be used for simple promises implementation, and the
-`Mongoise` object itself.  Mongoise allows you to access
-MongoDB collection and cursor methods and use their return
-values as promises.
 
 The `Deferred` object is not very feature complete.
 A much more complete promises library is the

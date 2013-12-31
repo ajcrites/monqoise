@@ -1,12 +1,12 @@
 var should = require("should"),
-    mongoisePackage = new require("../src/mongoise")
+    monqoisePackage = new require("../src/monqoise"),
+    Q = require("q")
 ;
-Deferred = mongoisePackage.Deferred;
-mongoise = new mongoisePackage.Mongoise;
+monqoise = new monqoisePackage.Monqoise;
 
-describe("Mongoise", function () {
+describe("monqoise", function () {
     before(function (done) {
-        mongoise.connect(process.env.MONGOISE_TEST_URI).done(function () {
+        monqoise.connect(process.env.MONQOISE_TEST_URI).done(function () {
             done();
         });
     });
@@ -14,9 +14,9 @@ describe("Mongoise", function () {
     // This is done purely as a smoke test
     describe("connect", function () {
         it("should connect", function (done) {
-            should.exist(mongoise.dbc);
-            mongoise.dbc.collection("foo").drop(function () {
-                mongoise.dbc.collection("bar").drop(function () {
+            should.exist(monqoise.dbc);
+            monqoise.dbc.collection("foo").drop(function () {
+                monqoise.dbc.collection("bar").drop(function () {
                     done();
                 });
             });
@@ -25,27 +25,27 @@ describe("Mongoise", function () {
 
     describe("CRUD", function () {
         it("should create a record", function (done) {
-            mongoise.collection("foo").insert({bar: "baz"}).done(function (result) {
+            monqoise.collection("foo").insert({bar: "baz"}).done(function (result) {
                 result[0].bar.should.equal("baz");
                 done();
             });
         });
 
         it("should find created a single record", function (done) {
-            mongoise.collection("foo").find({bar: "baz"}).toArray().done(function (result) {
+            monqoise.collection("foo").find({bar: "baz"}).toArray().done(function (result) {
                 result[0].bar.should.equal("baz");
                 done();
             });
         });
 
         it("should find multiple created records", function (done) {
-            var dfd = new Deferred;
-            mongoise.collection("foo").insert({bar: "baz"}).done(function () {
+            dfd = Q.defer();
+            monqoise.collection("foo").insert({bar: "baz"}).done(function () {
                 dfd.resolve();
             });
 
             dfd.promise.done(function () {
-                mongoise.collection("foo").find({bar: "baz"}).toArray().done(function (result) {
+                monqoise.collection("foo").find({bar: "baz"}).toArray().done(function (result) {
                     result.length.should.equal(2);
                     done();
                 });
@@ -53,7 +53,7 @@ describe("Mongoise", function () {
         });
 
         it("should not find a nonextant record", function (done) {
-            mongoise.collection("foo").find({bar: "no such bar"}).toArray().done(function (result) {
+            monqoise.collection("foo").find({bar: "no such bar"}).toArray().done(function (result) {
                 result.length.should.equal(0);
                 done();
             });
@@ -62,9 +62,9 @@ describe("Mongoise", function () {
 
     describe("fail", function () {
         it("should implement fail method", function (done) {
-            mongoise.dbc.collection("bar").ensureIndex({a: 1}, {unique: true}, function () {
-                mongoise.collection("bar").insert({a: "bar"}).done(function () {
-                    mongoise.collection("bar").insert({a: "bar"}).fail(function (err) {
+            monqoise.dbc.collection("bar").ensureIndex({a: 1}, {unique: true}, function () {
+                monqoise.collection("bar").insert({a: "bar"}).done(function () {
+                    monqoise.collection("bar").insert({a: "bar"}).fail(function (err) {
                         should.exist(err);
                         done();
                     });
@@ -75,7 +75,7 @@ describe("Mongoise", function () {
 
     describe("Chain", function () {
         it("should chain then method", function (done) {
-            mongoise.collection("foo").find({bar: "baz"}).toArray().done(function (result) {
+            monqoise.collection("foo").find({bar: "baz"}).toArray().then(function (result) {
                 should.exist(result);
                 result.length.should.equal(2);
                 return "chained";
@@ -86,7 +86,7 @@ describe("Mongoise", function () {
         });
 
         it("should respond to multiple then method", function (done) {
-            var promise = mongoise.collection("foo").find({bar: "baz"}).toArray();
+            var promise = monqoise.collection("foo").find({bar: "baz"}).toArray();
 
             promise.done(function () {
                 promise.done(function (resu) {
@@ -101,14 +101,14 @@ describe("Mongoise", function () {
 
     describe("Insert Options", function () {
         it("should allow options argument for insert", function (done) {
-            mongoise.collection("foo").insert({doc: "shock"}, {checkKeys: false}).done(function (results) {
+            monqoise.collection("foo").insert({doc: "shock"}, {checkKeys: false}).done(function (results) {
                 results[0].doc.should.equal("shock");
                 done();
             });
         });
 
         it("should insert multiple records", function (done) {
-            mongoise.collection("foo").insert([{doc: "more"}, {doc: "docs"}]).done(function (results) {
+            monqoise.collection("foo").insert([{doc: "more"}, {doc: "docs"}]).done(function (results) {
                 results.length.should.equal(2);
                 done();
             });
@@ -117,7 +117,7 @@ describe("Mongoise", function () {
 
     describe("Find Options", function () {
         it("should allow no argument for find", function (done) {
-            mongoise.collection("bar").find().toArray().done(function (results) {
+            monqoise.collection("bar").find().toArray().done(function (results) {
                 results.length.should.equal(1);
                 done();
             });
@@ -126,10 +126,10 @@ describe("Mongoise", function () {
 
     describe("No connection handling", function () {
         it("should throw an exception for collection with no DB", function (done) {
-            var mongoise = new mongoisePackage.Mongoise;
+            var monqoise = new monqoisePackage.Monqoise;
 
             try {
-                mongoise.collection("foo");
+                monqoise.collection("foo");
             }
             catch (err) {
                 should.exist(err);
@@ -140,7 +140,7 @@ describe("Mongoise", function () {
 
     describe("findOne", function () {
         it("should work with findOne", function (done) {
-            mongoise.collection("foo").findOne().done(function (result) {
+            monqoise.collection("foo").findOne().done(function (result) {
                 should.exist(result);
                 done();
             });

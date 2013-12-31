@@ -1,14 +1,16 @@
 var methods,
-    Cursor = require("./Cursor");
+    Q = require("q"),
+    Cursor = require("./Cursor"),
+    monqoise = require("./monqoise")
+;
 
-var Collection = function (name, mongoise) {
+var Collection = function (name, dbc) {
     this.name = name;
-    this.mongoise = mongoise;
-    this.collection = this.mongoise.dbc.collection(this.name);
+    this.collection = dbc.collection(this.name);
 };
 
 Collection.prototype.cursor = function (method, args) {
-    return new Cursor(method.apply(this.collection, args), this.mongoise);
+    return new Cursor(method.apply(this.collection, args));
 }
 
 /**
@@ -21,8 +23,7 @@ methods = ["insert", "remove", "save", "update", "distinct", "count", "findAndMo
 "indexExists", "geoNear", "geoHaystackSearch", "indexes", "stats"];
 methods.forEach(function (func) {
     Collection.prototype[func] = function () {
-        return this.mongoise.callMethodWithDeferred(this.collection,
-            this.collection[func], arguments);
+        return monqoise.argumentInvoke(this.collection, func, arguments);
     };
 });
 
@@ -38,8 +39,7 @@ methods.forEach(function (func) {
             return this.cursor(this.collection[func], arguments);
         }
         else {
-            return this.mongoise.callMethodWithDeferred(this.collection,
-                this.collection[func], arguments);
+            return monqoise.argumentInvoke(this.collection, func, arguments);
         }
     }
 });
