@@ -1,5 +1,5 @@
 var should = require("should"),
-    monqoisePackage = new require("../src/monqoise"),
+    monqoisePackage = require("../src/monqoise"),
     Q = require("q")
 ;
 monqoise = new monqoisePackage.Monqoise;
